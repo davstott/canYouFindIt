@@ -1,0 +1,1032 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Can You Find It?</title>
+
+		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+		<meta name="author" content="Hakim El Hattab">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="css/reveal.min.css">
+		<link rel="stylesheet" href="css/theme/default.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', use the PDF print sheet -->
+		<script>
+			document.write( '<link rel="stylesheet" href="css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+<div class="slides">
+    <section>
+        <h1>Can you find it?<br>
+</h1>
+<img src="https://s3.amazonaws.com/media-p.slid.es/uploads/davstott/images/138560/Spy2.png">
+        <img src="https://s3.amazonaws.com/media-p.slid.es/uploads/davstott/images/138562/sherlock.png">
+        <br>
+        <br>
+        <br>A walk through of GCHQ's 2013 internet puzzle<br>
+        <blockquote>https://canyoufindit.co.uk/<br> </blockquote>
+<br>
+    </section>
+    <section>
+        <h2>So, what is it?</h2>
+A much easier sequel to GCHQ's 2012 competition,<br>Can You Crack It?<br>
+        <br>An internet treasure hunt, made up of a series of 5 code breaking and technology puzzles that each have a one word answer<br>
+        <br>
+        <div align="left">A publicity campaign and prize draw to win some gadgetry<br>
+</div>
+<br>A recruitment exercise for GCHQ, looking for people with&nbsp;&nbsp; enthusiasm and a general aptitude, but not necessarily experience<br>
+        <br>An excuse to play with some gentle statistics<br>
+    </section>
+    <section>
+        <section>
+            <h2>Question 1</h2>
+<p>
+            <a href="https://canyoufindit.co.uk/">https://canyoufindit.co.uk</a>
+        </p>
+<img src="https://s3.amazonaws.com/media-p.slid.es/uploads/davstott/images/138586/0_-_front_page.jpg">
+    </section>
+    <section>
+        <h2>question 1<br>
+</h2>
+
+<blockquote>
+<p>AWVLI QIQVT QOSQO ELGCV IIQWD LCUQE EOENN WWOAO</p>
+<p>LTDNU QTGAW TSMDO QTLAO QSDCH PQQIQ DQQTQ OOTUD</p>
+<p>BNIQH BHHTD UTEET FDUEA UMORE SQEQE MLTME TIREC</p>
+<p>LICAI QATUN QRALT ENEIN RKG</p>
+</blockquote>
+<div align="left">All Latin characters between A and Z<br>The letter Q occurs far too often. I'm guessing Q = space<br>
+        <br>I'm no cryptanalyist, but I know people who are. They said this is a classical transposition cipher <br>
+</div>
+    </section>
+    <section>
+        <h2>Transposition cipher</h2>
+<p align="left">A message is written out in rows of a certain length, discarding everything that isn't a letter.<br>
+    </p>
+<p align="left">The cipher text is then read downwards, a column at&nbsp; time</p>
+<p align="left">For example, the plain text "We are discovered; flee"*,</p>
+<p align="left">with a key length of 5, looks like this:</p>
+<pre align="left">WEARE<br>DISCO<br>VERED<br>FLEE<br>
+</pre>
+<div align="left">Reading that downwards, we get  "WDVFEIELASRERCEEEOD"<br>
+</div>
+<br>
+<br>
+<div align="left">*Sir Arthur Conan Doyle<br>
+</div>
+</section>
+<section>
+    <h2>TRANSPOSITION CIPHER</h2>
+<div align="left">
+The python code to automatically encode a transposition cipher looks like this. It hops along the plain text from the 1st character in steps of 'key', picking out characters until it runs out of 
+message, then starts again from the 2nd character, and so on<br>
+<pre><code>plain = "WEAREDISCOVEREDFLEE"
+key = 5
+
+cipher = ""
+for i in range(key):
+  while (i &lt; len(plain)):
+    cipher = cipher + plain[i]
+    i += key
+print cipher
+</code></pre>Running this gives us "WDVFEIELASRERCEEEOD",&nbsp; the same as when we encoded it by hand.
+</div>
+</section>
+<section>
+    <h2>Transposition cipher</h2>
+<p align="left">Decoding the transposition cipher is the same process as encoding it, but the row length is the cipher text length, divided by the key</p>
+<p align="left">In our case, our message is 19 characters long</p>
+<p align="left">19 / 5 = 3.8. Rounded up, we use a row length of 4<br>
+</p>
+<p align="left">Starting with the cipher text "WDVFEIELASRERCEEEOD" and a key length of 5, we can write it out in rows of length 4<br>
+</p>
+<pre align="left">WDVF<br>EIEL<br>ASRE<br>RCEE<br>EOD</pre>
+<div align="left">Reading downwards, we get "WEAREDISCOVEREDFLEE"<br>
+</div>
+</section>
+<section>
+    <h2>TRANSPOSITION CIPHER<br>
+</h2>
+<div align="left">The python code to decode this automatically looks like this.<br>It hops along the cipher text from the 1st character in steps of rowLength, picking out plain text characters until it runs out of message, then starts again from the 2nd character, and so on.
+</div>
+<pre><code>import math
+
+cipher = "WDVFEIELASRERCEEEOD"
+key = 5
+
+plain = ""
+rowLength = int(math.ceil(float(len(cipher)) / key))
+
+for i in range(rowLength):
+  while (i &lt; len(cipher)):
+    plain = plain + cipher[i]
+    i += rowLength
+
+print plain
+</code></pre>
+<div align="left"><font style="font-size: 18px;">To keep this simple, I've neglected the padding of the end of the message, this decrypt doesn't react well if the encrypted message has more than one empty character at the end of it when fitted into the decrypt 'grid'</font>
+<br>
+</div>
+</section>
+<section>
+    <h2>Question 1</h2>
+<p align="left">This gives us the method for deciphering, but we also need to know the key. We have a number of options for recovering it:<br>
+</p>
+<ul>
+<li>Statistical Analysis</li>
+<li>Brute Force</li>
+<li>Social Engineering</li>
+</ul>
+<p>
+<br>
+</p>
+<img src="http://imgs.xkcd.com/comics/security.png">
+<br>
+</section>
+<section>
+    <h2>Brute Force</h2>
+<p align="left">There's going to be at most 142 different keys to try,</p>
+<p align="left"> so lets brute force it by adding a loop to our python code and feeding it our cipher text:<br>
+</p>
+<pre>1 AWVLI I VT OS OELGCVII WDLCU EEOENNWWOAOLTDNU TGAWTSMDO TLAO
+2 A WTV LOIO TIU DVBTN IO SH BOHEHLTGDCUVTIEIE TWFDDLUCEUA UEM
+3 AADWWUVTELSAIMU DMIOO  RVTETLS A OOES   SEODMECLLHTGPMC EV T
+4 AW  WOTEVA MLOOLILOT TTMIDUE NDTVUBIT NR TIEOG CSAHL WBIOTHC
+5 AEAHIWEOTRVO DELESUCINDTL NCEIIWHEC WPTAVO FITA D  OIUAOL ET
+6 ADA DLWLWTUIVCT ECLUSOAAI MOUI EDTM IEOUOA O DRTVETBEUTNLNSN
+7 AIDCHSAW NHB TVWUPHEULD  H NILT TE  CGIDMRIUA ULA  WDTTLVET 
+8 ACWO U AWVO TTETVIAT EMULIOLOELNI LAOTT  WTOTFMRIDD UDEA LNS
+9 ALEAHBDTUWGNWPNUMNVCNT IEE LVWS  ATRIIWMIHUIA IOD BMRLI AODH
+10 AEE  OUSLEWLOTSOT INVGEGDTEECELCNACUE AIIVNWHDTEIN IWTPBFM R
+<font color="#ff0000">11 A COMPUTER WOULD DESERVE TO BE CALLED INTELLIGENT IF IT COUL</font>
+12 ASDWA  HD LAW LOWSTBUEILVOCATD HEMCTLEUOSCOHALAEIL LMHOTUTIN
+13 AO NU  TTAMIAWSWN T UDULCLV DWTLIDUMTATLOLWGA BTOMIEIECOAODN
+14 AO NU  TTAMIAWSWN T UDULCLV DWTLIDUMTATLOLWGA BTOMIEIECOAODN
+15 A IELT DBUUML RWOIOTSS NTMLIRKVS EDMD IEOTCAGL WNNDCT ERMALI
+16 ATCUW OC NUA RAEW V OT HTITUEETNVOIEAGTP  EMMCUELSIEOAL OHEO
+17 ATCUW OC NUA RAEW V OT HTITUEETNVOIEAGTP  EMMCUELSIEOAL OHEO
+18 AVLDELATH BTDETLUNWTGLNTWLPTNDUSMINEV CCNDTA  IUE EC ILOVUWN
+19 AVLDELATH BTDETLUNWTGLNTWLPTNDUSMINEV CCNDTA  IUE EC ILOVUWN
+</pre>
+<br></section><section><h2>the turing test<br>
+</h2>
+<p align="left">A key length of 11 looks like it gives us a plain text written in English, decoding the full message gives us:</p>
+<p align="left"><br></p>
+<blockquote>A COMPUTER WOULD DESERVE TO BE CALLED INTELLIGENT IF IT COULD DECEIVE A HUMAN INTO BELIEVING THAT IT WAS HUMAN WWWDOTMETRODOTCODOTUKSLASHTURING<br>
+</blockquote>
+<br>Our first answer is 'TURING'<br></section></section><section><section><h2>Question 2</h2>
+<p><a href="http://www.metro.co.uk/turing">http://www.metro.co.uk/turing</a></p>
+<img src="https://s3.amazonaws.com/media-p.slid.es/uploads/davstott/images/139244/turing.metro.co.uk.png"></section><section><h2>comp1.key</h2>
+<pre> -----BEGIN RSA PRIVATE KEY-----
+MIIC2gIBAAKBgDfABK8+joDLdbFTDJ+y3PTTzkqCi1L2qEjgxdg1iyZshJTeKUck
+SYVyKBeOBtB3FwwqXVa6iNEHJeLFewFE6ulEOIcatVp11Zg0ibMfnqTivbd6t8/z
+3KzqrFksg9xQiicMactmTqFkm8ro5ODc2NTQzMjEwLy4tLCslBOCOVHxAgMBAAEC
+gYATW12FB2BtQbecmSxh6rWjYENZRZhgdvoZS8oF9xlYfwdNtRF5/RR1/BwFia++
+BAuBktgTu/KzORsjcNPzrd0uTCbTG6hW8YPK2ROVOOeAMHek8Nl3+SW5wdePKuWw
+MdjDDjqxXDns+ZC1d2Cpz5V+x+2znOYL0bsEKei0sWl7LQKBgDfABK8+joDLdbFT
+DJ+y3PTTzkqCi1L2qEjgxdg1iyZshJTeKUckSYVyKBeOBtB3FwwqXVa6iNEHJeLF
+ewFE6uhVSior5HGPArFhsOQ0v9ob1NCV7P8M99qN4XplmX/xs05HgQCVh9aMWtio
+pKCcmJSQjIiEgHx4dHBsU9JB+TvkAkB3dy53aHRzaXNpbGd1b2VjdHNyZWhzcmku
+ZW9jdS4va2xidGVoY2VsIHkgICAgICAgICAgICAgICAgICAgIAuPAkATpSSd/C5S
+IEAbUPk+ZYAdt7OYVzay7ViAiaukhkt+/sJG+m8GmHnAKyLf9ohx3/aIcd/2iHHf
+9ohx3/ayirJPAkAIefJYEpdAoRjJQCHPGUpOVjLiyQMyPcnsutG+ctAGGU8lZTDU
+yUim9V7iwqTE4sKkxOLCpMTiwqTE4sKkxOFNAoGAFInzTsAOkauW3crd1XfxMhxi
+tUkapdQqlwvFhZuouNIybfEOfW6WkjtghBDyqf50cEFWXMJ7Vk8mr6cwTosPvYKU
+VXKUCblretLTeU95TlbkprizPky++5b7pQuSi3mpLMi+6VgvcjTthfXPYNg2JjJp
+gmteC4felYL/2FTAmT8=
+-----END RSA PRIVATE KEY----</pre>
+<br></section><section><h2>Rivest, shamir &amp; Adleman</h2>
+<ul>
+<li>The RSA algorithm was first published in 1977*</li>
+<li>Still in use today for public / private key cryptography</li>
+<ul><li>Not going to go into the maths because I don't really understand them, but the keys are based around the product of two prime numbers.</li></ul>
+<li>One key must be kept secret, the other must be published.</li>
+<li>Anything encrypted with the public key, can only be decrypted with the private key</li>
+</ul>
+<p><br></p>
+
+<div align="left">
+<font style="font-size: 24px;">*In the USA<br>It was independently invented in the UK in 1973, but GCHQ kept it <strike>classified</strike> Protectively Marked until 1997</font><br>
+</div>
+
+</section><section><h2>What is there to decrypt?</h2>
+<ul>
+<li>We've got us a private key, but there's nothing obvious to decrypt with it.</li>
+<li>I first thought it should be used to log into something using SSH, but I couldn't find an ssh server on canyoucrackit.co.uk or turing.metro.co.uk</li>
+<li>Lets look a bit more closely at the key using openssl<br>
+</li>
+</ul></section><section><h2>openssl -x509 -in comp1.key -text</h2>
+<table width="100%"><tbody><tr>
+<td width="50%">
+<pre><font style="font-size: 14px;">Private-Key: (1022 bit)
+modulus:
+    37:c0:04:af:3e:8e:80:cb:75:b1:53:0c:9f:b2:dc:
+    f4:d3:ce:4a:82:8b:52:f6:a8:48:e0:c5:d8:35:8b:
+    26:6c:84:94:de:29:47:24:49:85:72:28:17:8e:06:
+    d0:77:17:0c:2a:5d:56:ba:88:d1:07:25:e2:c5:7b:
+    01:44:ea:e9:44:38:87:1a:b5:5a:75:d5:98:34:89:
+    b3:1f:9e:a4:e2:bd:b7:7a:b7:cf:f3:dc:ac:ea:ac:
+    59:2c:83:dc:50:8a:27:0c:69:cb:66:4e:a1:64:9b:
+    ca:e8:e4:e0:dc:d8:d4:d0:cc:c8:c4:c0:bc:b8:b4:
+    b0:ac:94:13:82:39:51:f1
+publicExponent: 65537 (0x10001)
+privateExponent:
+    13:5b:5d:85:07:60:6d:41:b7:9c:99:2c:61:ea:b5:
+    a3:60:43:59:45:98:60:76:fa:19:4b:ca:05:f7:19:
+    58:7f:07:4d:b5:11:79:fd:14:75:fc:1c:05:89:af:
+    be:04:0b:81:92:d8:13:bb:f2:b3:39:1b:23:70:d3:
+    f3:ad:dd:2e:4c:26:d3:1b:a8:56:f1:83:ca:d9:13:
+    95:38:e7:80:30:77:a4:f0:d9:77:f9:25:b9:c1:d7:
+    8f:2a:e5:b0:31:d8:c3:0e:3a:b1:5c:39:ec:f9:90:
+    b5:77:60:a9:cf:95:7e:c7:ed:b3:9c:e6:0b:d1:bb:
+    04:29:e8:b4:b1:69:7b:2d
+prime1:
+    37:c0:04:af:3e:8e:80:cb:75:b1:53:0c:9f:b2:dc:
+    f4:d3:ce:4a:82:8b:52:f6:a8:48:e0:c5:d8:35:8b:
+    26:6c:84:94:de:29:47:24:49:85:72:28:17:8e:06:
+    d0:77:17:0c:2a:5d:56:ba:88:d1:07:25:e2:c5:7b:
+    01:44:ea:e8:55:4a:2a:2b:e4:71:8f:02:b1:61:b0:
+    e4:34:bf:da:1b:d4:d0:95:ec:ff:0c:f7:da:8d:e1:
+    7a:65:99:7f:f1:b3:4e:47:81:00:95:87:d6:8c:5a:
+    d8:a8:a4:a0:9c:98:94:90:8c:88:84:80:7c:78:74:
+    70:6c:53:d2:41:f9:3b:e4
+</font></pre>
+</td>
+<td width="50%">
+<pre><font style="font-size: 14px;">prime2:
+<font color="#ff0000">    77:77:2e:77:68:74:73:69:73:69:6c:67:75:6f:65:
+    63:74:73:72:65:68:73:72:69:2e:65:6f:63:75:2e:
+    2f:6b:6c:62:74:65:68:63:65:6c:20:79:20:20:20:
+    20:20:20:20:20:20:20:20:20:20:20:20:20:20:20:
+    20:20:0b:8f</font>
+exponent1:
+    13:a5:24:9d:fc:2e:52:20:40:1b:50:f9:3e:65:80:
+    1d:b7:b3:98:57:36:b2:ed:58:80:89:ab:a4:86:4b:
+    7e:fe:c2:46:fa:6f:06:98:79:c0:2b:22:df:f6:88:
+    71:df:f6:88:71:df:f6:88:71:df:f6:88:71:df:f6:
+    b2:8a:b2:4f
+exponent2:
+    08:79:f2:58:12:97:40:a1:18:c9:40:21:cf:19:4a:
+    4e:56:32:e2:c9:03:32:3d:c9:ec:ba:d1:be:72:d0:
+    06:19:4f:25:65:30:d4:c9:48:a6:f5:5e:e2:c2:a4:
+    c4:e2:c2:a4:c4:e2:c2:a4:c4:e2:c2:a4:c4:e2:c2:
+    a4:c4:e1:4d
+coefficient:
+    14:89:f3:4e:c0:0e:91:ab:96:dd:ca:dd:d5:77:f1:
+    32:1c:62:b5:49:1a:a5:d4:2a:97:0b:c5:85:9b:a8:
+    b8:d2:32:6d:f1:0e:7d:6e:96:92:3b:60:84:10:f2:
+    a9:fe:74:70:41:56:5c:c2:7b:56:4f:26:af:a7:30:
+    4e:8b:0f:bd:82:94:55:72:94:09:b9:6b:7a:d2:d3:
+    79:4f:79:4e:56:e4:a6:b8:b3:3e:4c:be:fb:96:fb:
+    a5:0b:92:8b:79:a9:2c:c8:be:e9:58:2f:72:34:ed:
+    85:f5:cf:60:d8:36:26:32:69:82:6b:5e:0b:87:de:
+    95:82:ff:d8:54:c0:99:3f
+</font>    </pre>
+</td>
+    </tr>
+</tbody>
+</table>
+</section>
+<section>
+<h2>Hexadecimal ascii</h2>
+<pre>prime2:
+    77:77:2e:77:68:74:73:69:73:69:6c:67:75:6f:65:
+    63:74:73:72:65:68:73:72:69:2e:65:6f:63:75:2e:
+    2f:6b:6c:62:74:65:68:63:65:6c:20:79:20:20:20:
+    20:20:20:20:20:20:20:20:20:20:20:20:20:20:20:
+    20:20:0b:8f</pre>
+<div align="left">
+    <ul>
+<li>You'll have seen this if you've ever looked at a URL that includes things like spaces in it (%20)*<br>
+</li>
+        <li>20 in hexadecimal is 32 in decimal, or the space character</li>
+<li>Why would a prime number only have octets from such a small range of values, and have a lot of space characters at the end of it?</li>
+<li>Lets assume that it's ASCIII and the spaces are just padding to make the number have the correct length</li>
+</ul>
+<p><font style="font-family: inherit; font-style: inherit; font-variant: inherit; text-align: center; font-size: 18px;">*yes, I know a space is technically a + in URL encoding...</font><br></p>
+<ul></ul>
+</div>
+</section><section><h2>Question 2</h2>
+<p align="left">Another snippet of python to translate this into ASCII:</p>
+<pre><code>cipher = "77:77:2e:77:68:74:73:69:73:69:6c:67:75:6f:65:63:74:73:72:65:68:73:72:69:2e:65:6f:63:75:2e:2f:6b:6c:62:74:65:68:63:65:6c:20:79:20:20:20:20:20:20:20:20:20:20:20:20:20:20:20:20:20:20:20:20:0b:8f"
+
+plain = ""<br>for x in cipher.split(":"):
+  plain += chr(int(x[0] + x[1], 16))
+
+print plain
+</code></pre>
+<div align="left">gives us<br>
+</div>
+<pre><code> ww.whtsisilguoectsrehsri.eocu./klbtehcel y               </code></pre>
+<div align="left">which looks a little bit like a mixed up URL<br>
+</div>
+<br>
+</section>
+<section>
+<h2>Question 2</h2>
+<pre><code> ww.whtsisilguoectsrehsri.eocu./klbtehcel y               </code></pre>
+<div align="left">
+<ul>
+<li>URLs often start with www., so what if ww.w is supposed to be www.</li>
+    <li>This snippet of python will run through a string, a pair of characters at a time, and swap them over:</li>
+</ul>
+<pre><code>rearranged = ""
+x = 0
+while (x &lt; len(mixedUp)):
+  rearranged += mixedUp[x + 1] + mixedUp[x]
+  x = x + 2
+</code></pre>
+<ul>
+<li>giving us:<br>
+</li>
+</ul>
+<pre><code>www.thisisgloucestershire.co.uk/bletchley</code></pre>
+</div>
+<ul>
+<li>Our second answer is, Bletchley</li>
+</ul>
+</section>
+</section>
+<section>
+    <section>
+        <h2>question3</h2>
+<a href="http://www.thisisgloucestershire.co.uk/bletchley.html">http://www.thisisgloucestershire.co.uk/bletchley.html</a>
+        <br>
+        <img src="https://s3.amazonaws.com/media-p.slid.es/uploads/davstott/images/139392/c3.png">
+    </section>
+    <section>
+        <h2>Question 3</h2>
+<div>
+<br>
+</div>
+<div style="text-align: left;">
+<ul>
+<li>
+<span>This is a very large hexadecimal number, made up of a full range of numbers.</span>
+<br>
+</li>
+<li>
+<span>Sketching a quick line graph confirms that there isn't much information there to go on</span>
+        <br>
+        <img style="width: 399.096px; height: 216px; max-height: none; max-width: none;" src="https://s3.amazonaws.com/media-p.slid.es/uploads/davstott/images/140294/q3_encrypted.png">
+</li>
+<li>It's probably encrypted</li>
+
+
+
+
+</ul>
+</div>
+</section>
+        <section>
+            <h2>Decrypting RSA with a dodgy key</h2>
+<ul>
+<li>as well as telling us about the key, openssl can decrypt using the RSA algorithm<br>
+<pre>dav@tadpole:~/gchq$ openssl rsautl -decrypt -in q3.binary -inkey comp1.key
+RSA operation error
+3073493192:error:0306E06C:bignum routines:BN_mod_inverse:no inverse:bn_gcd.c:491:</pre>
+</li>
+<li>but it doesn't like our key, probably because of maths</li>
+<li>Python's PyCrypto module includes a lower level implementation of RSA that can work with just the vital parts of the key's components, skipping things like message padding and formatting<br>
+</li>
+</ul>
+
+<br>
+    </section>
+    <section>
+        <h2>Decrypting RSA with a dodgy python</h2>
+<p align="left">The modulus, public and private exponents in the key are just very large numbers. Copying them into a python script: </p>
+<pre><code>from Crypto.PublicKey import RSA
+
+modulus = 0x37c004af3e8e80cb75b1530c9fb2dcf4d3ce4... &lt;snip&gt;
+privateExponent = 0x135b5d8507606d41b79c992c61eab5a3... &lt;snip&gt;
+publicExponent = 0x10001L
+
+ciphertext = 0x2910404C21CF8BF4CC93B7D4A518BABF34B42A8AB00476... &lt;snip&gt;
+
+rsaKey = RSA.construct((modulus, publicExponent, privateExponent))
+plaintext = rsaKey.decrypt(ciphertext)
+print hex(plaintext)</code></pre>
+<div align="left">gives us<br>
+<pre><code>0x202020202020202077772e77687472656765736965742e726f63752e2f6b6e
+656769616d303233312020202020202020L
+</code></pre>Yet more space characters?  </div>
+</section>
+<section>
+<h2>Decoding the answer</h2>
+<pre><code>0x202020202020202077772e77687472656765736965742e726f63752e2f6b6e
+656769616d303233312020202020202020L</code></pre>
+<img style="width: 329.048px; height: 248.002px; max-height: none; max-width: none;" src="https://s3.amazonaws.com/media-p.slid.es/uploads/davstott/images/140578/q3_decrypted.png">
+<br>
+<div align="left">Even if we didn't recognise all of the 0x20 characters in that number, the graph shows that we've now got a very small range of byte values in our output<br>The randomness has been replaced by a signal.<br>
+</div>
+</section>
+<section>
+<h2>Decoding the answer<br>
+</h2>
+<pre><code>0x202020202020202077772e77687472656765736965742e726f63752e2f6b6e
+656769616d303233312020202020202020L</code></pre>
+<div align="left">Chopping that number up into bytes and converting them into characters gives us:<br>
+<pre><code>         ww.whtregesiet.rocu./knegiam0231         </code></pre>Again, this looks a bit like a URL, so swapping its characters around in the same way as before gives us:<br>
+<pre><code> www.theregister.co.uk/enigma2013 </code></pre>Giving Enigma as the 3rd answer<br>
+<br>
+</div>
+</section>
+</section>
+<section>
+    <section>
+        <h2>question4</h2>
+<a href="http://www.theregister.co.uk/enigma2013">www.theregister.co.uk/enigma2013</a>
+<img src="https://s3.amazonaws.com/media-p.slid.es/uploads/davstott/images/147345/Screenshot_from_2013-11-09_16_22_04.png">
+    </section>
+    <section>
+<h2>comp3.jpg</h2>
+<h2>
+    <img src="https://s3.amazonaws.com/media-p.slid.es/uploads/davstott/images/147347/comp3.jpg">
+</h2>
+<div align="left">
+    <ul>
+<li>JPEG of a photograph of a machine named Colossus (Mk. 2)</li>
+        <li>Last year, there was a clue hidden in a PNG metadata tag</li>
+        <li>But there's nothing in this JPEG's JFIF tags:</li>
+</ul>
+<pre><code>dav@newt:~/gchq/source$ jhead comp3.jpg
+File name    : comp3.jpg
+File size    : 62468 bytes
+File date    : 2013:09:04 16:52:50
+Resolution   : 350 x 246
+</code>    </pre>
+</div>
+</section>
+    <section>
+<h2>Steganography?</h2>
+<div align="left">
+    <ul>
+<li>So far, this game has given us everything we've needed to solve each puzzle as we've gone along</li>
+        <li>Is there anything hidden within this jpeg?</li>
+        <li>Lets reencode it as a JPEG and find out:</li>
+</ul>
+<pre><code>dav@newt:~/gchq/source$ python
+Python 2.7.4 (default, Sep 26 2013, 03:20:26)
+[GCC 4.7.3] on linux2
+Type "help", "copyright", "credits" or "license" for more information.
+&gt;&gt;&gt; from PIL import Image
+&gt;&gt;&gt; Image.open('comp3.jpg').save('alsoComp3.jpg')
+&gt;&gt;&gt; 
+dav@newt:~/gchq/source$ jhead alsoComp3.jpg
+File name    : alsoComp3.jpg
+File size    : 24437 bytes
+File date    : 2013:11:09 16:40:25
+Resolution   : 350 x 246
+</code>    </pre>
+        <li>Only 24k? Where's the other 37k gone? and what was in it?</li>
+    
+</div>
+</section>
+    <section>
+        <h2>decomposition</h2>
+<div align="left">
+<ul>
+        <li>Using GIMP to decompose the RGB image into its three colour channels doesn't reveal anything interesting</li>
+    </ul>
+<img src="https://s3.amazonaws.com/media-p.slid.es/uploads/davstott/images/147378/gimp.jpg">
+</div>
+</section>
+<section>
+    <h2>JPEG FILES<br>
+</h2>
+<div align="left">
+    <ul>
+<li>Ever seen a web browser drawing a large jpeg from a slow network connection?</li>
+    </ul>
+<div align="center">
+        <img src="http://adavu.com/wp-content/uploads/2010/12/baselineJPEG.jpg">(*)<br>
+    <div align="left">
+            <ul>
+<li>JFIF encoded JPEG images stored as a series of independent blocks of image data (**)</li>
+                <li>Allows it to survive missing / corrupted blocks</li>
+                <li>Most importantly here, it ignores surplus blocks</li>
+            </ul>
+<p>
+        <font style="font-size: 18px;">(*)http://adavu.com/what-is-baseline-jpeg-and-progressive-jpeg/</font> <br>
+    <font style="font-size: 18px;">(**)&nbsp; I'm not getting&nbsp; into blocks of Discrete Cosine Transformation </font>
+    <font style="font-size: 18px;">coefficients </font>
+    </p>
+</div>
+</div>
+</div>
+</section>
+    <section>
+<h2>JPEG FILE INTERCHANGE FORMAT</h2>
+<ul>
+<li>If you look at a the JPEG File Interchange Format, all images start with a similar sequence (SOI &amp; App0)</li>
+<li>Hex numbers FF D8 FF E0</li>
+<li>and the ASCII Characters 'JFIF'</li>
+</ul>
+<pre><code>0000000: ffd8 ffe0 0010 4a46 4946 0001 0101 00c8  ......JFIF......
+0000010: 00c8 0000 ffdb 0043 0002 0101 0101 0102  .......C........</code></pre>
+<ul>
+<li>So what if there's more than one in there?</li>
+<li>Searching through the file for the sequence reveals this, starting at byte 0xCBD4, or 52180 <br>
+</li>
+</ul>
+<pre><code>000cbd0: 401f ffd9 ffd8 ffe0 0010 4a46 4946 0001  @.........JFIF..
+000cbe0: 0101 0048 0048 0000 ffdb 0043 0001 0101  ...H.H.....C....
+</code></pre>
+
+<div align="left">
+    <br>
+</div>
+</section>
+<section>
+<h2>concatenated images</h2>
+<div align="left">
+    <ul>
+<li>Splitting the second image away from the first by copying all the bytes out of the file, starting at the offset we've just worked out:<br>
+</li>
+</ul>
+<pre><code>dav@davstott:/tmp$ tail -c +52181 comp3.jpg &gt; comp3a.jpg</code></pre>
+<ul>
+<li>Gives us another valid JPEG that looks like this:</li>
+</ul>
+<img src="https://s3.amazonaws.com/media-p.slid.es/uploads/davstott/images/147800/comp3a.jpg">
+<br>
+<ul>
+    <li>Giving us 'colossus' as our 4th word<br>
+</li>
+</ul>
+<ul>
+</ul>
+</div>
+
+</section>
+</section>
+<section>
+    <section>
+        <h2>Question5</h2>
+<a href="http://www.eveningstandard.co.uk/colossus">www.eveningstandard.co.uk/colossus</a>
+        <br>
+        <img src="https://s3.amazonaws.com/media-p.slid.es/uploads/davstott/images/147801/q5.png">
+    </section>
+    <section>
+        <h2>question 5</h2>
+<div align="left">
+<ul>
+<li>Our 5th, and final answer is 'secured'</li>
+<li>The final web page has been removed at the time of writing<br>
+</li>
+</ul>
+<img src="https://s3.amazonaws.com/media-p.slid.es/uploads/davstott/images/147802/q6.png">
+</div>
+</section>
+</section>
+<section>
+    <section>
+<h2>Choosing the right answer</h2>
+<div align="left">
+
+We chose the correct solution to question 1 just by looking at it because there were only a few possible solutions.
+
+</div>
+<pre>1 AWVLI I VT OS OELGCVII WDLCU EEOENNWWOAOLTDNU TGAWTSMDO TLAO
+2 A WTV LOIO TIU DVBTN IO SH BOHEHLTGDCUVTIEIE TWFDDLUCEUA UEM
+3 AADWWUVTELSAIMU DMIOO  RVTETLS A OOES   SEODMECLLHTGPMC EV T
+4 AW  WOTEVA MLOOLILOT TTMIDUE NDTVUBIT NR TIEOG CSAHL WBIOTHC
+5 AEAHIWEOTRVO DELESUCINDTL NCEIIWHEC WPTAVO FITA D  OIUAOL ET
+6 ADA DLWLWTUIVCT ECLUSOAAI MOUI EDTM IEOUOA O DRTVETBEUTNLNSN
+7 AIDCHSAW NHB TVWUPHEULD  H NILT TE  CGIDMRIUA ULA  WDTTLVET 
+8 ACWO U AWVO TTETVIAT EMULIOLOELNI LAOTT  WTOTFMRIDD UDEA LNS
+9 ALEAHBDTUWGNWPNUMNVCNT IEE LVWS  ATRIIWMIHUIA IOD BMRLI AODH
+10 AEE  OUSLEWLOTSOT INVGEGDTEECELCNACUE AIIVNWHDTEIN IWTPBFM R
+<font color="#ff0000">11 A COMPUTER WOULD DESERVE TO BE CALLED INTELLIGENT IF IT COUL</font>
+12 ASDWA  HD LAW LOWSTBUEILVOCATD HEMCTLEUOSCOHALAEIL LMHOTUTIN
+13 AO NU  TTAMIAWSWN T UDULCLV DWTLIDUMTATLOLWGA BTOMIEIECOAODN
+14 AO NU  TTAMIAWSWN T UDULCLV DWTLIDUMTATLOLWGA BTOMIEIECOAODN
+15 A IELT DBUUML RWOIOTSS NTMLIRKVS EDMD IEOTCAGL WNNDCT ERMALI
+16 ATCUW OC NUA RAEW V OT HTITUEETNVOIEAGTP  EMMCUELSIEOAL OHEO
+17 ATCUW OC NUA RAEW V OT HTITUEETNVOIEAGTP  EMMCUELSIEOAL OHEO
+18 AVLDELATH BTDETLUNWTGLNTWLPTNDUSMINEV CCNDTA  IUE EC ILOVUWN
+19 AVLDELATH BTDETLUNWTGLNTWLPTNDUSMINEV CCNDTA  IUE EC ILOVUWN
+</pre>
+<div align="left">
+
+But what if its key wasn't 11, but was instead 111 or 1,111,111
+<br>
+</div></section><section><h2>Choosing the right answer(*)</h2>
+<img src="http://rlv.zcache.com/knowledge_is_power_do_statistics_stats_humor_tshirt-re570122c20394bbbaff0aca700092bf6_804gs_512.jpg"><br><div align="left">
+(*) Using the power of statistics
+</div></section><section><h2>Detecting English<br>
+</h2>
+
+<p align="left">In the 1940s, letter frequency was the one of the key weapons in cryptanalysis. In English:</p>
+<table style="font-size: 24px; line-height:1.2em" width="100%" id="freqTable"><tbody>
+<tr>
+<td>E</td>
+    <td>11.2%</td>
+    <td>M</td>
+    <td>3.0%</td>
+</tr>
+<tr>
+<td>A</td>
+<td>8.5%</td>
+<td>H</td>
+<td>3.0%</td>
+</tr>
+<tr>
+<td>R</td>
+<td>7.6%</td>
+<td>G</td>
+<td>2.5%</td>
+</tr>
+<tr>
+<td>I</td>
+<td>7.5%</td>
+<td>B</td>
+<td>2.1%</td>
+</tr>
+<tr>
+<td>O</td>
+<td>7.2%</td>
+<td>F</td>
+<td>1.8%</td>
+</tr>
+<tr>
+<td>T</td>
+<td>6.9%</td>
+<td>Y</td>
+<td>1.7%</td>
+</tr>
+<tr>
+<td>N</td>
+<td>6.7%</td>
+<td>W</td>
+<td>1.3%</td>
+</tr>
+<tr>
+<td>S</td>
+<td>5.7%</td>
+<td>K</td>
+<td>1.1%</td>
+</tr>
+<tr>
+<td>L</td>
+<td>5.5%</td>
+<td>V</td>
+<td>1.0%</td>
+</tr>
+<tr>
+<td>C</td>
+<td>4.5%</td>
+<td>X</td>
+<td>0.3%</td>
+</tr>
+<tr>
+<td>U</td>
+<td>3.6%</td>
+<td>Z</td>
+<td>0.27%</td>
+</tr>
+<tr>
+<td>D</td>
+<td>3.4%</td>
+<td>J</td>
+<td>0.1965%</td>
+</tr>
+<tr>
+<td>P</td>
+<td>3.2%</td>
+<td>Q</td>
+<td>0.1962%</td>
+</tr>
+</tbody></table>
+<p align="left"><font style="font-size: 18px;">*http://www.oxforddictionaries.com/words/what-is-the-frequency-of-the-letters-of-the-alphabet-in-english</font></p>
+
+
+
+
+
+
+</section><section><h2>Detecting English<br>
+</h2>
+<p align="left">We can use the letter frequency data to come up with a probability that a given block of text is English by multiplying the probabilities together:</p>
+<blockquote>
+    <p align="left">Hello Mum!</p>
+</blockquote>
+<pre><code>P(H) * P(e) * P(l) * P(l) * P(o) * P(M) * P(u) * P(m) =
+
+.03  * .11  * .054 * .054 * .072 * .03  * .036  * .03 = 2.2448E-11</code></pre>
+<div align="left">But this approach on its own:<br>
+    <ul>
+<li>Makes very small numbers (risks floating point underflows)</li>
+<li>Only interesting when compared to other probabilities</li>
+<li>Doesn't consider character order (our transposition cipher is really just an anagram)</li>
+</ul>
+</div>
+</section>
+    <section>
+<h2>Detecting other languages</h2>
+<blockquote>
+    <p>Hello Mum!</p>
+</blockquote>
+<div align="left">Using letter frequencies(*) from other languages <br>
+</div>
+<pre>'English'   : 1.503e-11
+'Esperanto' : 3.267e-12
+'Dutch'     : 3.729e-12
+'Turkish'   : 4.354e-12
+'Swedish'   : 5.922e-12
+'Italian'   : 5.937e-12
+'German '   : 7.076e-12
+'Spanish'   : 8.063e-12
+'Portuguese': 8.466e-12
+'French'    : 9.652e-12<br>'Polish'    : 7.439e-13</pre>
+<div align="left">This lets us choose which language is the most likely from a collection of languages by ordering the results<br>
+</div>
+<div align="left">
+<font style="font-size: 18px;">(*)http://en.wikipedia.org/wiki/Letter_frequency#Relative_frequencies_of_letters_in_other_languages</font>
+        <br>
+</div>
+    </section>
+    <section>
+        <h2>n-Grams</h2>
+<p align="left">Using a medium sized corpus, such as the Google English One Million, we can build ourselves a probability model of the relative frequencies of letters occurring after other letters:</p>
+
+<table style="background-color: white; color: black;">
+        <tbody>
+<tr>
+<th>
+        </th>
+<th>a</th>
+<th>b</th>
+<th>c</th>
+<th>d</th>
+<th>e</th>
+<th>f</th>
+</tr>
+<tr>
+<th>a</th>
+<td>
+0.000577
+</td>
+<td>
+0.00296
+</td>
+    <td>
+0.00469
+</td>
+<td>
+0.00346
+</td>
+<td>
+0.00179
+</td>
+<td>
+0.0013
+</td>
+</tr>
+<tr>
+<th>b</th>
+<td>
+0.00346
+</td>
+<td>
+0.000419
+</td>
+<td>
+0.000221
+</td>
+<td>
+0.00015
+</td>
+<td>
+0.00396
+</td>
+<td>
+8.81e-05
+</td>
+</tr>
+<tr>
+<th>c</th>
+<td>
+0.00594
+</td>
+<td>
+0.000151
+</td>
+<td>
+0.00132
+</td>
+<td>
+0.00024
+</td>
+<td>
+0.00457
+</td>
+<td>
+0.000151
+</td>
+</tr>
+<tr>
+<th>d</th>
+<td>
+0.00327
+</td>
+<td>
+0.000183
+</td>
+<td>
+0.000334
+</td>
+<td>
+0.000657
+</td>
+<td>
+0.00753
+</td>
+<td>
+0.000173
+</td>
+</tr>
+<tr>
+<th>e</th>
+<td>
+0.00427
+</td>
+<td>
+0.00131
+</td>
+<td>
+0.00388
+</td>
+<td>
+0.00692
+</td>
+<td>
+0.00284
+</td>
+<td>
+0.0019
+</td>
+</tr>
+<tr>
+<th>f</th>
+<td>
+0.00174
+</td>
+<td>
+8.73e-05
+</td>
+<td>
+0.000369
+</td>
+<td>
+7.95e-05
+</td>
+<td>
+0.00255
+</td>
+<td>
+0.00152
+</td>
+</tr>
+</tbody>
+    </table>
+<br>
+    <div align="left">Probability of 'xy' can be written as the probability of y given x<br>P('ab') = P(b | a) = 0.00296<br>P('da') = P(a | d) = 0.00327<br>
+</div>
+
+
+
+
+</section>
+    <section>
+        <h2>n-Grams and logarithms</h2>
+<p align="left">Using the base 10 logarithms of the probabilities from our 2- and 3- gram models to avoid very small numbers:<br>
+    </p>
+
+<blockquote>
+    Hello Mum!
+</blockquote>
+
+<br>
+<pre><code>P('he') + P('el') + P('ll') + P('lo') + P('mu') + P('um') = -14.0
+
+P('hel') + P('ell') + P('llo') + P('mum') = -13.19
+</code></pre>
+<div align="left">
+<br>Bringing all of this together, we can combine our script that brute forces each of the keys to the transposition cipher to our script that calculates the relative probability that each solution is English<br>
+</div>
+</section>
+<section>
+<h2>2-grams</h2>
+<pre>1 -297 AWVLI I VT OS OELGCVII WDLCU EEOENNWWOAOLTDNU TGAWTSMDO TLAO
+2 -287 A WTV LOIO TIU DVBTN IO SH BOHEHLTGDCUVTIEIE TWFDDLUCEUA UEM
+3 -294 AADWWUVTELSAIMU DMIOO  RVTETLS A OOES   SEODMECLLHTGPMC EV T
+4 -270 AW  WOTEVA MLOOLILOT TTMIDUE NDTVUBIT NR TIEOG CSAHL WBIOTHC
+5 -288 AEAHIWEOTRVO DELESUCINDTL NCEIIWHEC WPTAVO FITA D  OIUAOL ET
+6 -294 ADA DLWLWTUIVCT ECLUSOAAI MOUI EDTM IEOUOA O DRTVETBEUTNLNSN
+7 -293 AIDCHSAW NHB TVWUPHEULD  H NILT TE  CGIDMRIUA ULA  WDTTLVET
+8 -284 ACWO U AWVO TTETVIAT EMULIOLOELNI LAOTT  WTOTFMRIDD UDEA LNS
+9 -298 ALEAHBDTUWGNWPNUMNVCNT IEE LVWS  ATRIIWMIHUIA IOD BMRLI AODH
+10 -292 AEE  OUSLEWLOTSOT INVGEGDTEECELCNACUE AIIVNWHDTEIN IWTPBFM R
+<font color="#ff0000">11 -244 A COMPUTER WOULD DESERVE TO BE CALLED INTELLIGENT IF IT COUL</font>
+12 -284 ASDWA  HD LAW LOWSTBUEILVOCATD HEMCTLEUOSCOHALAEIL LMHOTUTIN
+13 -284 AO NU  TTAMIAWSWN T UDULCLV DWTLIDUMTATLOLWGA BTOMIEIECOAODN
+14 -284 AO NU  TTAMIAWSWN T UDULCLV DWTLIDUMTATLOLWGA BTOMIEIECOAODN
+</pre>
+<div align="left">The most likely result is -244, with most of the rest of the others at around -280 to -290. <br><br>A clear&nbsp; result, but there's not much variance between the most likely result and the other results<br>
+</div></section><section><h2>3-grams</h2>
+<pre>1 -397 AWVLI I VT OS OELGCVII WDLCU EEOENNWWOAOLTDNU TGAWTSMDO TLAO<br>2 -375 A WTV LOIO TIU DVBTN IO SH BOHEHLTGDCUVTIEIE TWFDDLUCEUA UEM<br>3 -400 AADWWUVTELSAIMU DMIOO  RVTETLS A OOES   SEODMECLLHTGPMC EV T<br>4 -341 AW  WOTEVA MLOOLILOT TTMIDUE NDTVUBIT NR TIEOG CSAHL WBIOTHC<br>5 -383 AEAHIWEOTRVO DELESUCINDTL NCEIIWHEC WPTAVO FITA D  OIUAOL ET<br>6 -391 ADA DLWLWTUIVCT ECLUSOAAI MOUI EDTM IEOUOA O DRTVETBEUTNLNSN<br>7 -395 AIDCHSAW NHB TVWUPHEULD  H NILT TE  CGIDMRIUA ULA  WDTTLVET<br>8 -366 ACWO U AWVO TTETVIAT EMULIOLOELNI LAOTT  WTOTFMRIDD UDEA LNS<br>9 -402 ALEAHBDTUWGNWPNUMNVCNT IEE LVWS  ATRIIWMIHUIA IOD BMRLI AODH<br>10 -379 AEE  OUSLEWLOTSOT INVGEGDTEECELCNACUE AIIVNWHDTEIN IWTPBFM R<br><font color="#ff0000">11 -291 A COMPUTER WOULD DESERVE TO BE CALLED INTELLIGENT IF IT COUL</font><br>12 -381 ASDWA  HD LAW LOWSTBUEILVOCATD HEMCTLEUOSCOHALAEIL LMHOTUTIN<br>13 -378 AO NU  TTAMIAWSWN T UDULCLV DWTLIDUMTATLOLWGA BTOMIEIECOAODN<br>14 -378 AO NU  TTAMIAWSWN T UDULCLV DWTLIDUMTATLOLWGA BTOMIEIECOAODN<br></pre>
+<div align="left">Using 3-grams, the most likely result is -291 with the others around -380 to -400 <br>
+<br>That's more like it.<br>
+</div>
+</section>
+</section>
+<section>
+    <h2>Further Reading</h2>
+<p>
+    <br>
+</p>
+<p>Cryptonomicon - Neal Stephenson</p>
+<p>
+<a href="http://inventwithpython.com/hacking/">Hacking Secret Cyphers with Python</a> - Al Sweigart</p>
+<p>
+<a href="www.win.tue.nl/~henkvt/cryptobook/cryptodict.pdf">Fundamentals of Cryptology</a> - Henk van Tilborg<br>
+</p>
+<p>
+<a href="http://gchqchallenge.blogspot.co.uk">Solution to Can You Crack It?</a> - Dr Gareth Owen</p>
+<p>
+<a href="https://www.udacity.com/course/cs271">Introduction to Artifical Intelligence</a> - Udacity</p>
+<p>
+<a href="http://storage.googleapis.com/books/ngrams/books/datasetsv2.html">Google Books</a> corpora<br>
+</p>
+</section>
+<section>
+    <h2>
+        <br>
+    </h2>
+<p>
+    <br>
+</p>
+<p>Dav Stott</p>
+<p>
+<br>
+</p>
+<p>https://github.com/davstott/canYouFindIt<br>
+</p>
+</section>
+</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
