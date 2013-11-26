@@ -75,9 +75,18 @@ A much easier sequel to GCHQ's 2012 competition,<br>Can You Crack It?<br>
 <p>BNIQH BHHTD UTEET FDUEA UMORE SQEQE MLTME TIREC</p>
 <p>LICAI QATUN QRALT ENEIN RKG</p>
 </blockquote>
-<div align="left">All Latin characters between A and Z<br>The letter Q occurs far too often. I'm guessing Q = space<br>
-        <br>I'm no cryptanalyst, but I know people who are. They said this is a classical transposition cipher <br>
+<div align="left">
+<ul>
+<li>All Latin characters between A and Z</li>
+    <li>The letter Q occurs far too often. I'm guessing Q = space</li>
+    <li>I'm not much of a cryptanalyst, but I know people who are, and they said this is a classical transposition cipher (*)</li>
+</ul>
+<p>
+<font style="font-size: 18px;">(*) I'll revisit this later on with how to tell this is a transposition, rather than substitution cipher</font>
+<br>
+</p>
 </div>
+
     </section>
     <section>
         <h2>Transposition cipher</h2>
@@ -236,7 +245,7 @@ gmteC4felYL/2FTAmT8=
 <li>Lets look a bit more closely at the key using openssl<br>
 </li>
 </ul>
-<iframe src="http://showterm.io/524e5f874e8f464075a37#slow" width="640" height="300"></iframe>
+<iframe src="http://showterm.io/524e5f874e8f464075a37#stop" width="640" height="300"></iframe>
 
 </section><section><h2>openssl rsa -in comp1.key -text</h2>
 <table width="100%"><tbody><tr>
@@ -504,7 +513,7 @@ File date    : 2013:11:09 16:40:25
 Resolution   : 350 x 246
 </code></pre>
 </noscript>
-<iframe src="http://showterm.io/470f28e5ac9854a314c32#slow" width="640" height="300"></iframe>
+<iframe src="http://showterm.io/470f28e5ac9854a314c32#stop" width="640" height="300"></iframe>
         <li>Only 24k? The original was 61k. Where's the other 37k gone? and what was in it?</li>
     
 </div>
@@ -726,13 +735,62 @@ But what if its key wasn't 11, but was instead 111 or 1,111,111
 </tr>
 </tbody></table>
 <p align="left"><font style="font-size: 18px;">*http://www.oxforddictionaries.com/words/what-is-the-frequency-of-the-letters-of-the-alphabet-in-english</font></p>
+</section>
+<section>
+<h2>Detecting English for Question 1</h2>
+<ul>
+    <li>Earlier on, we mentioned that Question 1 was a transposition cipher, or an anagram. <br>
+    </li>
+    <li>Another way to find this out is to look at the letter counts:</li>
+</ul>
+<table width="100%">
+    <tbody>
+<tr>
+    <th width="50%">Question 1</th>
+    <th width="50%">English</th>
+</tr>
+    <tr>
+<td valign="top">
+<pre><code>     14%    Q
+     9.8%   T
+     9.8%   E
+     7%     O
+     7%     I
+     5.6%   L
+     5.6%   D
+     5.6%   A
+     4.9%   U
+     4.9%   N
+     3.5%   W
+     3.5%   C
+     2.8%   S
+     2.8%   R
+&lt;snip&gt;
+</code></pre>
+</td>
+<td valign="top">
+    <pre><code>E       11.2%
+A	8.5%
+R	7.6%
+I	7.5%
+O	7.2%
+T	6.9%
+N	6.7%
+S	5.7%
+L	5.5%
+C	4.5%
+U	3.6%
+M        3.0%
+H	3.0%
+G	2.5%
+&lt;snip&gt;   </code></pre>
+</td>
+</tr>
+</tbody>
+</table>
+</section>
 
-
-
-
-
-
-</section><section><h2>Detecting English<br>
+<section><h2>Detecting English<br>
 </h2>
 <p align="left">We can use the letter frequency data to come up with a probability that a given block of text is English by multiplying the probabilities together:</p>
 <blockquote>
