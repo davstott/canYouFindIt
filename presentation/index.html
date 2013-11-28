@@ -414,11 +414,15 @@ while (x &lt; len(mixedUp)):
         <section>
             <h2>Decrypting RSA with a dodgy key</h2>
 <ul>
-<li>as well as telling us about the key, openssl can decrypt using the RSA algorithm<br>
+<li>as well as telling us about the key, openssl can decrypt using the RSA algorithm</li>
+</ul>
+<noscript>
 <pre>dav@tadpole:~/gchq$ openssl rsautl -decrypt -in q3.binary -inkey comp1.key
 RSA operation error
 3073493192:error:0306E06C:bignum routines:BN_mod_inverse:no inverse:bn_gcd.c:491:</pre>
-</li>
+</noscript>
+<iframe src="http://showterm.io/f5b30e4e4c024101676d3#stop" width="640" height="300"></iframe>
+<ul>
 <li>but it doesn't like our key, probably because of maths</li>
 <li>Python's PyCrypto module includes a lower level implementation of RSA that can work with just the vital parts of the key's components, skipping things like message padding and formatting<br>
 </li>
