@@ -43,13 +43,13 @@
         <img src="https://s3.amazonaws.com/media-p.slid.es/uploads/davstott/images/138562/sherlock.png">
         <br>
         <br>
-        <br>A walk through of GCHQ's 2013 internet puzzle<br>
+	<br>A walk through of <a href="https://www.gchq.gov.uk">GCHQ</a>'s 2013 internet puzzle<br>
         <blockquote>https://canyoufindit.co.uk/<br> </blockquote>
 <br>
     </section>
     <section>
         <h2>So, what is it?</h2>
-A much easier sequel to GCHQ's 2012 competition,<br>Can You Crack It?<br>
+A much easier sequel to GCHQ's 2011 competition,<br>Can You Crack It?<br>
         <br>An internet treasure hunt, made up of a series of 5 code breaking and technology puzzles that each have a one word answer<br>
         <br>
         <div align="left">A publicity campaign and prize draw to win some gadgetry<br>
@@ -476,13 +476,24 @@ print hex(plaintext)</code></pre>
     </section>
     <section>
 <h2>comp3.jpg</h2>
-<h2>
+<div align="center">
     <img src="https://s3.amazonaws.com/media-p.slid.es/uploads/davstott/images/147347/comp3.jpg">
-</h2>
+</div>
 <div align="left">
     <ul>
 <li>JPEG of a photograph of a machine named Colossus (Mk. 2)</li>
-        <li>Last year, there was a clue hidden in a PNG metadata tag</li>
+    </ul>
+</div>
+  </section>
+  <section>
+	  <div align="left">
+		  <ul>
+<li>Encoded in the older JFIF file format<br>
+	<pre><code>dav@newt:~/gchq/source$ file comp3.jpg 
+comp3.jpg: JPEG image data, JFIF standard 1.01, resolution (DPI), 
+density 200x200, segment length 16, baseline, precision 8, 350x246,
+frames 3 </code></pre></li>
+        <li>In one of 2012's competitions, there was a clue hidden in a PNG metadata tag</li>
         <li>But there's nothing in this JPEG's JFIF tags:</li>
 </ul>
 <pre><code>dav@newt:~/gchq/source$ jhead comp3.jpg
@@ -543,7 +554,7 @@ Resolution   : 350 x 246
             <ul>
 <li>JFIF encoded JPEG images stored as a series of independent blocks of image data (**)</li>
                 <li>Allows it to survive missing / corrupted blocks</li>
-                <li>Most importantly here, it ignores surplus blocks</li>
+                <li>Most importantly, it ignores surplus blocks beyond the End Of Image marker</li>
             </ul>
 <p>
         <font style="font-size: 18px;">(*)https://yuiblog.com/blog/2008/12/05/imageopt-4/</font> <br>
@@ -557,7 +568,7 @@ Resolution   : 350 x 246
     <section>
 <h2>JPEG FILE INTERCHANGE FORMAT</h2>
 <ul>
-<li>If you look at a the JPEG File Interchange Format, all images start with a similar sequence (SOI &amp; App0)</li>
+	<li>If you look at a the JPEG File Interchange Format, all images start with a <a href="https://en.wikipedia.org/wiki/JPEG_File_Interchange_Format#JFIF_APP0_marker_segment">similar sequence</a> (SoI &amp; App0)</li>
 <li>Hex numbers FF D8 FF E0</li>
 <li>and the ASCII Characters 'JFIF'</li>
 </ul>
@@ -612,10 +623,27 @@ Resolution   : 350 x 246
 <ul>
 <li>Our 5th, and final answer is 'secured'</li>
 <li>The final web page has been removed at the time of writing<br>
+<img src="https://s3.amazonaws.com/media-p.slid.es/uploads/davstott/images/147802/q6.png">
 </li>
 </ul>
-<img src="https://s3.amazonaws.com/media-p.slid.es/uploads/davstott/images/147802/q6.png">
 </div>
+    </section>
+    <section>
+	    <h2>Answers</h2>
+	    <div align="left">
+   <ul>
+<li>But all that remained was to enter the 5 answers into the competition's website*<br>
+	<img src="http://www.stephenpeek.co.uk/gchq_competitions/gchq_can_you_find_it/correct_answers.png"></li>
+</ul>
+</div>
+<p><br></p>
+
+<div align="left">
+	<font style="font-size: 24px;">*<a href="http://www.stephenpeek.co.uk/gchq_can_you_find_it.htm">http://www.stephenpeek.co.uk/gchq_can_you_find_it.htm</a></font>
+</div>
+
+
+
 </section>
 </section>
 <section>
@@ -1031,22 +1059,15 @@ P('hel') + P('ell') + P('llo') + P('mum') = -13.19
 </section>
 <section>
     <h2>Further Reading</h2>
-<p>
-    <br>
-</p>
+<p> <br> </p>
 <p>Cryptonomicon - Neal Stephenson</p>
-<p>
-<a href="http://inventwithpython.com/hacking/">Hacking Secret Cyphers with Python</a> - Al Sweigart</p>
-<p>
-<a href="www.win.tue.nl/~henkvt/cryptobook/cryptodict.pdf">Fundamentals of Cryptology</a> - Henk van Tilborg<br>
-</p>
-<p>
-<a href="http://gchqchallenge.blogspot.co.uk">Solution to Can You Crack It?</a> - Dr Gareth Owen</p>
-<p>
-<a href="https://www.udacity.com/course/cs271">Introduction to Artifical Intelligence</a> - Udacity</p>
-<p>
-<a href="http://storage.googleapis.com/books/ngrams/books/datasetsv2.html">Google Books</a> corpora<br>
-</p>
+<p> <a href="https://www.cybersecuritychallenge.org.uk/">UK Cyber Security Challenge</a> - started after the 2012 and 2013 competitions were popular</p>
+<p> <a href="https://www.canyoucrackit.co.uk/">2012 - Can You Crack It</a></p>
+<p> <a href="http://inventwithpython.com/hacking/">Hacking Secret Cyphers with Python</a> - Al Sweigart</p>
+<p> <a href="www.win.tue.nl/~henkvt/cryptobook/cryptodict.pdf">Fundamentals of Cryptology</a> - Henk van Tilborg<br> </p>
+<p> <a href="http://gchqchallenge.blogspot.co.uk">Solution to Can You Crack It?</a> - Dr Gareth Owen</p>
+<p> <a href="https://www.udacity.com/course/cs271">Introduction to Artifical Intelligence</a> - Udacity</p>
+<p> <a href="http://storage.googleapis.com/books/ngrams/books/datasetsv2.html">Google Books</a> corpora<br> </p>
 </section>
 <section>
     <h2>
